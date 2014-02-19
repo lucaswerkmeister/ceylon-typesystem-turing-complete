@@ -22,7 +22,7 @@ interface Q of Q1|Q2|Q3 {}
 alias Accept => B<Q2>;
 
 "Box around a type"
-interface B<T> {}
+interface B<out T> {}
 
 "State transition function"
 S&Q1&C&X1&B<Q1> |
