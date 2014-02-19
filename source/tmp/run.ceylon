@@ -17,7 +17,7 @@ abstract class X2() of x2 {} object x2 extends X2() {}
 interface Q of Q1|Q2|Q3 {}
 interface Q1 satisfies Q {}
 interface Q2 satisfies Q {}
-interface Q3 satisfies Q {}
+interface Q3 satisfies Q {} // “trash” state
 
 "Box around a type"
 interface B<out T> {}
@@ -29,12 +29,14 @@ alias Accept => B<Q2>;
 object initial satisfies B<Q1> {}
 
 "State transition function"
-S&Q1&C&X1&B<Q1> |
-S&Q1&C&X2&B<Q2> |
-S&Q2&C&X1&B<Q3> |
-S&Q2&C&X2&B<Q2> |
-S&Q3&C&X1&B<Q3> |
-S&Q3&C&X2&B<Q3>
+S&Q1&C&X1&B<Q1> | // when in state Q1 and reading character x1, stay in state Q1
+S&Q1&C&X2&B<Q2> | // when in state Q1 and reading character x2, go to state Q2
+S&Q2&C&X1&B<Q3> | // when in state Q2 and reading character x1, go to state Q3
+S&Q2&C&X2&B<Q2> | // when in state Q2 and reading character x2, stay in state Q2
+S&Q3&C&X1&B<Q3> | // when in state Q3 and reading character x1, stay in state Q3
+S&Q3&C&X2&B<Q3>   // when in state Q3 and reading character x2, stay in state Q3
+// the two Q3 transitions could also be combined as
+// S&Q3&B<Q3>
         t<S,C>(B<S> state, C x)
         given S of Q
         given C of X1|X2
