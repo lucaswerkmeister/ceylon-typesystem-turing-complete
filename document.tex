@@ -1,0 +1,116 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+\author{Lucas Werkmeister}
+\title{Ceylon Type System is Chomsky-3 complete}
+
+\maketitle
+\tableofcontents
+
+\section{Abstract}
+
+In this article, I will demonstrate an algorithm to transform a finite state automaton into several Ceylon definitions (classes, interfaces, one function), and a second algorithm to transform any word into a Ceylon statement that uses these definitions.
+The statement is then well-typed if, and only if, the word is accepted by the automaton.
+
+This proves that the type system / typechecker of the Ceylon programming language is Chomsky-3-complete.
+
+\section{Notation}
+
+I shall write $\bigcup\limits_{t\in T}t$ for the union and $\bigcap\limits_{t\in T}t$ for the intersection of the types $T$.
+
+\section{The automaton}
+
+The automaton is given as a five-tuple $(X,Q,q_s,t,F)$, where
+\begin{description}
+\item[$X$] is the input alphabet $\{x_1,\ldots,x_n\}$,
+\item[$Q$] is the set of states $\{q_1,\ldots,q_m\}$,
+\item[$q_s$] $\in Q$ is the initial state,
+\item[$t$]$: Q\times X\to Q$ is the state transition function, and
+\item[$F$] $\subseteq Q$ is the set of accepting states.
+\end{description}
+
+We define the auxiliary function $t^\ast: Q\times X\to\{1,\ldots,n\}, (q_i, x_j) \mapsto k: t(q_i, x_j) = q_k$.
+
+\section{The Ceylon definitions}
+
+\begin{itemize}
+\item For each character $x_i\in X$ of the input alphabet, define the \code{abstract class X$i$() of x$i$ \{\}} and an \code{object x$i$ extends X$i$() \{\}}.
+\item Define the \code{interface Q of $\bigcup\limits_{i=1,\ldots,m}{\code{Q}i}$ \{\}} (so, \code{interface Q of Q1|Q2|\ldots \{\}})
+\item For each state $q_i\in Q$, define the \code{interface Q$i$ satisfies Q \{\}}
+\item Define the \code{interface B<out T> \{\}} as a box for types
+\item Define the \code{alias Accept => B<$\bigcup\limits_{q_i\in F}\code{Q}i$>;}
+\item Define the \code{object initial satisfies B<Q$s$> \{\}} (where $q_s$ is the initial state)
+\item Define the transition function.
+\end{itemize}
+
+\subsection{The transition function}
+
+All the state transitions are encoded into the return type of the transition function \code{t}.
+We’ll call that type expression $R$ for now, and look of the rest of the function:
+
+\code{
+$R$ t<S,C>(B<S> state, C char)\\
+given S of Q\\
+given C of $\bigcup\limits_{x_i\in X}\code{X}i$\\
+\{return nothing;\}
+}
+
+Now comes the last bit.
+
+\[
+R = \bigcup\limits_{q_i\in Q}\bigcup\limits_{x_j\in X} \code{S}\cap\code{Q}i \cap \code{C}\cap\code{X}j \cap \code{B<Q}t^\ast(q_i, x_j)\code{>}
+\]
+
+\section{The Ceylon expression}
+
+The word $x_{i_1}x_{i_2}\ldots x_{i_k}$ is transformed into the expression
+\code{Accept q = t(t(\ldots (t(initial, x$i_1$), x$i_2$), ...), x$i_k$);}
+
+\section{Example}
+The following example shows the resulting program for the regular expression $x_1^\ast x_2 x_2^\ast$ and the word $x_1x_1x_2x_2x_2$.
+\begin{verbatim}
+/* alphabet */
+abstract class X1() of x1 {} object x1 extends X1() {}
+abstract class X2() of x2 {} object x2 extends X2() {}
+
+/* states */
+interface Q of Q1|Q2|Q3 {}
+interface Q1 satisfies Q {}
+interface Q2 satisfies Q {}
+interface Q3 satisfies Q {}
+
+"Box around a type"
+interface B<out T> {}
+
+"Accepting state(s)"
+alias Accept => B<Q2>;
+
+"Initial state"
+object initial satisfies B<Q1> {}
+
+"State transition function"
+S&Q1&C&X1&B<Q1> |
+S&Q1&C&X2&B<Q2> |
+S&Q2&C&X1&B<Q3> |
+S&Q2&C&X2&B<Q2> |
+S&Q3&C&X1&B<Q3> |
+S&Q3&C&X2&B<Q3>
+        t<S,C>(B<S> state, C x)
+        given S of Q
+        given C of X1|X2
+{ return nothing; }
+
+shared void run() {
+    // This statement is well-typed if, and only if, the word composed of the characters in it
+    // (read left-to-right) is accepted by the finite state automaton encoded in t.
+    Accept q = t(t(t(t(t(initial, x1), x1), x2), x2), x2);
+}
+\end{verbatim}
+
+\end{document}
