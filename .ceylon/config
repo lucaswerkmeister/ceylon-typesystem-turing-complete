@@ -1,0 +1,7 @@
+
+[compiler]
+source=./source
+resource=./resources
+
+[defaults]
+encoding=UTF-8
