@@ -1,14 +1,13 @@
 void demo() {
     
     // The following statements are well-typed because (()()) is a well-formed parenthetical expression.
-    // Unfortunately, it is necessary to explicitly give the type arguments to t.
     
     value s0 = initial;
-    value s1 = t<Q0, StackEnd, Nothing, A>(s0, a);
-    value s2 = t<Q0, StackHead<S0, StackEnd>, StackEnd, A>(s1, a);
-    value s3 = t<Q0, StackHead<S0, StackHead<S0, StackEnd>>, StackHead<S0, StackEnd>, B>(s2, b);
-    value s4 = t<Q0, StackHead<S0, StackEnd>, StackEnd, A>(s3, a);
-    value s5 = t<Q0, StackHead<S0, StackHead<S0, StackEnd>>, StackHead<S0, StackEnd>, B>(s4, b);
-    value s6 = t<Q0, StackHead<S0, StackEnd>, StackEnd, B>(s5, b);
+    value s1 = t(s0, a, s0.second.rest);
+    value s2 = t(s1, a, s1.second.rest);
+    value s3 = t(s2, b, s2.second.rest);
+    value s4 = t(s3, a, s3.second.rest);
+    value s5 = t(s4, b, s2.second.rest);
+    value s6 = t(s5, b, s5.second.rest);
     Accept end = s6;
 }
