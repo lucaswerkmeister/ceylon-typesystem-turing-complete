@@ -1,0 +1,67 @@
+void demo() {
+    
+    // The following statements are well-typed because xxxxxxxx is 8 long and 8 is a power of 2.
+    
+    value s00 = initial(b(x, b(x, b(x, b(x, b(x, b(x, b(x, b(x, e())))))))));
+    value s01 = t(s00, s00.second.first, s00.second.rest, s00.third.first, s00.third.rest);
+    value s02 = t(s01, s01.second.first, s01.second.rest, s01.third.first, s01.third.rest);
+    value s03 = t(s02, s02.second.first, s02.second.rest, s02.third.first, s02.third.rest);
+    value s04 = t(s03, s03.second.first, s03.second.rest, s03.third.first, s03.third.rest);
+    value s05 = t(s04, s04.second.first, s04.second.rest, s04.third.first, s04.third.rest);
+    value s06 = t(s05, s05.second.first, s05.second.rest, s05.third.first, s05.third.rest);
+    value s07 = t(s06, s06.second.first, s06.second.rest, s06.third.first, s06.third.rest);
+    value s08 = t(s07, s07.second.first, s07.second.rest, s07.third.first, s07.third.rest);
+    value s09 = t(s08, s08.second.first, s08.second.rest, s08.third.first, s08.third.rest);
+    value s10 = t(s09, s09.second.first, s09.second.rest, s09.third.first, s09.third.rest);
+    value s11 = t(s10, s10.second.first, s10.second.rest, s10.third.first, s10.third.rest);
+    value s12 = t(s11, s11.second.first, s11.second.rest, s11.third.first, s11.third.rest);
+    value s13 = t(s12, s12.second.first, s12.second.rest, s12.third.first, s12.third.rest);
+    value s14 = t(s13, s13.second.first, s13.second.rest, s13.third.first, s13.third.rest);
+    value s15 = t(s14, s14.second.first, s14.second.rest, s14.third.first, s14.third.rest);
+    value s16 = t(s15, s15.second.first, s15.second.rest, s15.third.first, s15.third.rest);
+    value s17 = t(s16, s16.second.first, s16.second.rest, s16.third.first, s16.third.rest);
+    value s18 = t(s17, s17.second.first, s17.second.rest, s17.third.first, s17.third.rest);
+    value s19 = t(s18, s18.second.first, s18.second.rest, s18.third.first, s18.third.rest);
+    value s20 = t(s19, s19.second.first, s19.second.rest, s19.third.first, s19.third.rest);
+    value s21 = t(s20, s20.second.first, s20.second.rest, s20.third.first, s20.third.rest);
+    value s22 = t(s21, s21.second.first, s21.second.rest, s21.third.first, s21.third.rest);
+    value s23 = t(s22, s22.second.first, s22.second.rest, s22.third.first, s22.third.rest);
+    value s24 = t(s23, s23.second.first, s23.second.rest, s23.third.first, s23.third.rest);
+    value s25 = t(s24, s24.second.first, s24.second.rest, s24.third.first, s24.third.rest);
+    value s26 = t(s25, s25.second.first, s25.second.rest, s25.third.first, s25.third.rest);
+    value s27 = t(s26, s26.second.first, s26.second.rest, s26.third.first, s26.third.rest);
+    value s28 = t(s27, s27.second.first, s27.second.rest, s27.third.first, s27.third.rest);
+    value s29 = t(s28, s28.second.first, s28.second.rest, s28.third.first, s28.third.rest);
+    value s30 = t(s29, s29.second.first, s29.second.rest, s29.third.first, s29.third.rest);
+    value s31 = t(s30, s30.second.first, s30.second.rest, s30.third.first, s30.third.rest);
+    value s32 = t(s31, s31.second.first, s31.second.rest, s31.third.first, s31.third.rest);
+    value s33 = t(s32, s32.second.first, s32.second.rest, s32.third.first, s32.third.rest);
+    value s34 = t(s33, s33.second.first, s33.second.rest, s33.third.first, s33.third.rest);
+    value s35 = t(s34, s34.second.first, s34.second.rest, s34.third.first, s34.third.rest);
+    value s36 = t(s35, s35.second.first, s35.second.rest, s35.third.first, s35.third.rest);
+    value s37 = t(s36, s36.second.first, s36.second.rest, s36.third.first, s36.third.rest);
+    value s38 = t(s37, s37.second.first, s37.second.rest, s37.third.first, s37.third.rest);
+    value s39 = t(s38, s38.second.first, s38.second.rest, s38.third.first, s38.third.rest);
+    value s40 = t(s39, s39.second.first, s39.second.rest, s39.third.first, s39.third.rest);
+    value s41 = t(s40, s40.second.first, s40.second.rest, s40.third.first, s40.third.rest);
+    value s42 = t(s41, s41.second.first, s41.second.rest, s41.third.first, s41.third.rest);
+    value s43 = t(s42, s42.second.first, s42.second.rest, s42.third.first, s42.third.rest);
+    value s44 = t(s43, s43.second.first, s43.second.rest, s43.third.first, s43.third.rest);
+    value s45 = t(s44, s44.second.first, s44.second.rest, s44.third.first, s44.third.rest);
+    value s46 = t(s45, s45.second.first, s45.second.rest, s45.third.first, s45.third.rest);
+    value s47 = t(s46, s46.second.first, s46.second.rest, s46.third.first, s46.third.rest);
+    value s48 = t(s47, s47.second.first, s47.second.rest, s47.third.first, s47.third.rest);
+    value s49 = t(s48, s48.second.first, s48.second.rest, s48.third.first, s48.third.rest);
+    value s50 = t(s49, s49.second.first, s49.second.rest, s49.third.first, s49.third.rest);
+    value s51 = t(s50, s50.second.first, s50.second.rest, s50.third.first, s50.third.rest);
+    value s52 = t(s51, s51.second.first, s51.second.rest, s51.third.first, s51.third.rest);
+    value s53 = t(s52, s52.second.first, s52.second.rest, s52.third.first, s52.third.rest);
+    value s54 = t(s53, s53.second.first, s53.second.rest, s53.third.first, s53.third.rest);
+    value s55 = t(s54, s54.second.first, s54.second.rest, s54.third.first, s54.third.rest);
+    value s56 = t(s55, s55.second.first, s55.second.rest, s55.third.first, s55.third.rest);
+    value s57 = t(s56, s56.second.first, s56.second.rest, s56.third.first, s56.third.rest);
+    value s58 = t(s57, s57.second.first, s57.second.rest, s57.third.first, s57.third.rest);
+    value s59 = t(s58, s58.second.first, s58.second.rest, s58.third.first, s58.third.rest);
+    value s60 = t(s59, s59.second.first, s59.second.rest, s59.third.first, s59.third.rest);
+    Accept end = s60;
+}
