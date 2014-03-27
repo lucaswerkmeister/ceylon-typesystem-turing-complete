@@ -1,5 +1,13 @@
+The Power of the Ceylon Type System
+===================================
+
+The Ceylon type system is immensely powerful, and you can do loads and loads of cool stuff with it.
+Here, I demonstrate that it is *Turing complete*, meaning that you can perform arbitrary calculations with it.
+I repeat: **You can (in theory) do any calculation in the Ceylon type system**, and get the result via the compiler’s type inference (for example, the “insert inferred type” quick fix in the Ceylon Eclipse IDE).
+But we’ll start with small steps, and first demonstrate:
+
 Ceylon Type System is Chomsky-3-complete
-========================================
+----------------------------------------
 
 The type system / typechecker of the Ceylon programming language is Chomsky-3-complete, meaning that it can recognize regular languages.
 
@@ -15,22 +23,22 @@ Accept q = t(t(t(t(t(initial, _1), _6), _7), _3), _4);
 ```
 doesn’t, because 16735 isn’t divisible by three, but 16734 is.
 In other words, this statement compiles iff the arguments to the recursive `t` call chain form a number that isn’t divisible by three.
+(The chain can be as long as you want, or as long as the compiler can handle without a stack overflow.)
 
 How does this work?
 
 To explain this, we’ll first take an excursion and look at the theory of *regular languages*.
 
-Theoretical stuff
------------------
+### Theoretical stuff
 
 First, some simple terms:
 
-* An **alphabet** is a set of characters, for example { a, b } for very simple examples or { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 } for natural numbers.
+* An **alphabet** is a set of characters, for example `{ a, b }` for very simple examples or `{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }` for natural numbers.
 * A **word** over an alphabet is a sequence of characters from that alphabet.
-  For example, 12345 would be a word over the alphabet defined above.
+  For example, `12345` would be a word over the alphabet defined above.
   (Warning: This is slightly different from the normal use of the term; if your alphabet contains the space character, then “The rain in spain stays mainly in the plain” is *one* word.)
 * A **language** is simply a set of words over an alphabet.
-  You can define it directly – for example, { 1, 12, 123 } might me the language of my favorite numbers – but most useful languages are defined over some rule that all words in the language must fulfill, like “the language of all numbers not divisible by three” or “the language of all valid Ceylon programs”.
+  You can define it directly – for example, `{ 1, 12, 123 }` might me the language of my favorite numbers – but most useful languages are defined over some rule that all words in the language must fulfill, like “the language of all numbers not divisible by three” or “the language of all valid Ceylon programs”.
 * And, last but not least, a **regular language** is a language that can be *recognized* by a Deterministic Finite Automaton (DFA).
 
 What’s a deterministic finite automaton now? It’s a theoretical concept that’s usually represented like this:
@@ -49,14 +57,13 @@ One more example. The automaton to recognize numbers that aren’t divisible by 
 
 Now, we want to encode that automaton into the Ceylon type system.
 
-… transformed into code
--------------------------
+### … transformed into code
 
 We already saw how the result should be used:
 ```ceylon
 Accept q = t(t(t(t(t(initial, _1), _6), _7), _3), _5);
 ```
-should compile because 16735 is accepted by the automaton that we saw earlier, which is in turn because 16735 isn’t divisible by three.
+should compile because `16735` is accepted by the automaton that we saw earlier, which is in turn because 16735 isn’t divisible by three.
 `t` is the state transition function. It accepts a state as first argument, an input character as second argument, and then returns the following state.
 `initial` is the initial state, and `Accept` is an alias to the union of all accepting states.
 Thus, the statement compiles iff the state that the function returns on the last call is assignable to the union of accepting states – that is, if it’s an accepting state.
