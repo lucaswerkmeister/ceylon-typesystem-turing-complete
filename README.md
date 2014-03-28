@@ -179,7 +179,7 @@ Note that the first argument is now of type `B<S>` instead of `S`.
 Even if it’s a `Q0&R0&B<S>`, we don’t care, since we only cherry-pick the `S` part.
 
 And that’s it! Now it works, and we’ve encoded the automaton into the type system.
-(You can see the entire file in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon].)
+(You can see the entire file in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon](source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon).)
 
 Ceylon Type System is Chomsky-2 complete
 ----------------------------------------
