@@ -43,17 +43,17 @@ First, some simple terms:
 
 What’s a deterministic finite automaton now? It’s a theoretical concept that’s usually represented like this:
 
-[!image] TODO
+![A graph representing a DFA that tests if a number is not divisible by three](https://raw.githubusercontent.com/lucaswerkmeister/ceylon-typesystem-chomsky-3/renderedSVGs/notDivisibleByThree.png)
+
+<sup>(That is a rendered version of [this file](/notDivisibleByThree.svg), because SVGs aren’t supported in GitHub READMEs.)</sup>
 
 Every circle represents a *state* that the automaton can be in; at any time, it’s in exactly one state.
-We start off in the state that’s marked with a little unlabeled arrow.
+We start off in the state that’s marked with a little unlabeled arrow (`q0`).
 The automaton then reads the characters of the input word one after the other, and for each character it transitions into a different (or the same) state according to the arrow exiting the current state that’s labelled with the read character.
-For example, in the automaton above, the input TODO leads to the state transitions T->O->D->O.
-If the last state is an *accepting* state – which is usually marked by a double-line border – then the automaton *accepts* the word, which means that this word is in the language recognized by the automaton.
-
-One more example. The automaton to recognize numbers that aren’t divisible by three looks like this:
-
-[!image] TODO
+For example, in the automaton above, the input `16735` leads to the state transitions `q0→q1→q1→q2→q2→q1`.
+As the last state is an *accepting* state – which is usually marked by a double-line border – the automaton *accepts* the word, which means that this word is in the language recognized by the automaton.
+In this case, this is the language of all (decimal representations of) numbers that are not divisible by three:
+The automaton builds the digit sum, but only remembers its remainder modulo three in the states.
 
 Now, we want to encode that automaton into the Ceylon type system.
 

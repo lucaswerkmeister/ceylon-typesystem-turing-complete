@@ -1,0 +1,62 @@
+<svg width="300" height="350" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <style><![CDATA[
+      text {
+          text-anchor: middle;
+      }
+      text.transition {
+          font-size: 9pt;
+      }
+      g.node circle {
+          fill: white;
+          stroke: black;
+      }
+      g.node text.label tspan {
+          baseline-shift: sub;
+      }
+      path {
+          fill: transparent;
+          stroke: black;
+          marker-end: url("#Triangle");
+      }
+    ]]></style>
+    <marker id="Triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <polygon points="0,0 10,5 0,10"/>
+    </marker>
+    <g id="arrowClockwise">
+      <path d="M 15 -12 C 66 -50, 133 -50, 185 -12"/>
+      <text class="transition" x="100" y="-45">1,4,7</text>
+    </g>
+    <g id="arrowCounterclockwise">
+      <path d="M 180 6 C 133 20, 66 20, 20 5"/>
+      <text class="transition" x="100" y="30">2,5,8</text>
+    </g>
+  </defs>
+  <path d="M 10 100 H 30"/>
+  <g transform="translate(50 100)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>0</tspan></text>
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-65">0,3,6,9</text>
+    <use xlink:href="#arrowClockwise"/>
+    <use xlink:href="#arrowCounterclockwise"/>
+  </g>
+  <g transform="translate(250 100)" class="node">
+    <circle r="20"/>
+    <circle r="18"/>
+    <text class="label" y="5">q<tspan>1</tspan></text>
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-65">0,3,6,9</text>
+    <use transform="rotate(120)" xlink:href="#arrowClockwise"/>
+    <use transform="rotate(120)" xlink:href="#arrowCounterclockwise"/>
+  </g>
+  <g transform="translate(150 273.205080757)" class="node">
+    <circle r="20"/>
+    <circle r="18"/>
+    <text class="label" y="5">q<tspan>2</tspan></text>
+    <path d="M 0 20 C -50 75, 50 75, 0 20"/>
+    <text class="transition" y="75">0,3,6,9</text>
+    <use transform="rotate(240)" xlink:href="#arrowClockwise"/>
+    <use transform="rotate(240)" xlink:href="#arrowCounterclockwise"/>
+  </g>
+</svg>
