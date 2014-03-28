@@ -181,6 +181,168 @@ Even if it’s a `Q0&R0&B<S>`, we don’t care, since we only cherry-pick the `S
 And that’s it! Now it works, and we’ve encoded the automaton into the type system.
 (You can see the entire file in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon].)
 
+Ceylon Type System is Chomsky-2 complete
+----------------------------------------
+
+The next rank of the [Chomsky hierarchy](https://en.wikipedia.org/wiki/Chomsky_hierarchy) are context-free languages, which are all languages that can be recognized by a Pushdown Automaton.
+(Note: usually, context-free languages are written using a context-free grammar instead of a pushdown automaton, but both approaches are equivalent, and for our purpose, pushdown automata are much more convenient.)
+A pushdown automaton is basically an expansion of a finite automaton (as seen above) that in addition has a stack.
+With each transition, you can push or pop a character from that stack, and you can decide your target state by the current stack head in addition to the input character.
+
+For example, this is a very simple pushdown automaton:
+
+TODO image
+
+It recognizes the language of all well-formed parentheses: Each `(` pushes an item onto the stack and each `)` pops it off again.
+The automaton accepts the input word by empty stack: if there were as many `(`s as `)`s, and there was never a `)` without a corresponding `(` before it, then the parentheses are well-formed.
+
+Let’s try turning that into a typing problem:
+```ceylon
+/* alphabet */
+shared abstract class A() of a {} shared object a extends A() {}
+shared abstract class B() of b {} shared object b extends B() {}
+
+/* states */
+shared interface Q of Q0 {}
+shared interface Q0 satisfies Q {}
+
+/* stack elements */
+shared interface S of S0 {}
+shared interface S0 satisfies S {}
+
+"Pair of two types"
+shared interface P<out T, out S> {}
+
+shared interface Stack
+        of StackHead|StackEnd
+        {}
+shared interface StackHead<out Element=S0, out Rest=Stack>
+        satisfies Stack
+        given Element satisfies S
+        given Rest satisfies Stack
+        {}
+shared interface StackEnd
+        satisfies Stack
+        {}
+
+"Accepting state(s)"
+shared alias Accept => P<Q0, StackEnd>;
+
+"Initial state"
+shared object initial satisfies P<Q0, StackEnd> {}
+
+"""State transition function for the pushdown automaton
+   ~~
+   a,ε,s0
+   b,s0,ε
+   ↻
+   ~~
+   which accepts correct parenthetical statements ([[a]] being `(` and [[b]] being `)`) by empty stack.
+   """
+shared
+C&A&P<Q0,StackHead<S0, Stak>> |
+C&B&Stak&StackHead<S0, RestStak>&P<Q0, RestStak>
+        t<out Stat, out Stak, out RestStak, C>(P<Stat, Stak> state, C c)
+        given Stat satisfies Q
+        given RestStak satisfies Stack
+        given Stak of StackEnd|StackHead<S0, RestStak>
+                   satisfies Stack
+        given C of A|B
+{ return nothing; }
+```
+
+Observe the following differences:
+* Our alphabet has changed. `a` stands for the opening parenthesis, `b` for the closing parenthesis.
+  The stack alphabet consists of a single character `S0`.
+* We have replaced the “box” `B` with the “pair” `P`, since we need to pick both the state and the stack from the previous iteration’s return type.
+* `Accept` doesn’t narrow the state, but instead the stack, since this automaton accepts by empty stack instead of by accepting state.
+  (It is also acceptable <sup>I’ll show myself out</sup> for a pushdown automaton to accept by state, and this can easily be done here as well.)
+* And, of course, there’s now the `Stack`, which is a linked list of types similar to `Tuple`.
+* Last but not least, `t` uses all these changes to push and pop off the stack; pushing is done by wrapping a new `StackHead` around `Stak`, and popping is done by dropping `Stak` and directy returning `RestStak` instead.
+
+Looks great, let’s use it!
+```ceylon
+// The following statement is well-typed because (()()) is a well-formed parenthetical expression.
+Accept end = t(t(t(t(t(t(initial, a), a), b), a), b), b);
+```
+Unfortunately, that doesn’t compile – again, I first showed you an example that doesn’t work.
+Why?
+You get the following compile error on the second (counting right-to-left) `t` invocation:
+
+> Inferred type argument StackHead<S0,StackEnd> to type parameter Stak of declaration t not one of the enumerated cases of Stak
+
+This is because the compiler infers the type `Nothing` for `t`’s `RestStak` type argument (which is [correct behavior](https://groups.google.com/d/msg/ceylon-users/Kj28RcIm-Tw/EYQFM8KcjwgJ), not a bug, although I don’t quite understand why).
+There are two possible solutions for this:
+
+* we can explicitly specify the type arguments:
+
+```ceylon
+// The following statements are well-typed because (()()) is a well-formed parenthetical expression.
+
+value s0 = initial;
+value s1 = t<Q0,StackEnd,Nothing,A>(s0, a);
+value s2 = t<Q0,StackHead<S0,StackEnd>,StackEnd,A>(s1, a);
+value s3 = t<Q0,StackHead<S0,StackHead<S0,StackEnd>>,StackHead<S0,StackEnd>,B>(s2, b);
+value s4 = t<Q0,StackHead<S0,StackEnd>,StackEnd,A>(s3, a);
+value s5 = t<Q0,StackHead<S0,StackHead<S0,StackEnd>>,StackHead<S0,StackEnd>,B>(s4, b);
+value s6 = t<Q0,StackHead<S0,StackEnd>,StackEnd,B>(s5, b);
+Accept end = s6;
+```
+But this sucks, because now the compiler isn’t doing any work for us – we’re doing all the work (stepping through the automaton), and the compiler only confirms that we’re doing it correctly.
+Luckily, though, there is also a solution that makes the type argument inference work:
+
+* we can add parameters to `t`
+
+Then, the signature of `t` looks like this:
+```ceylon
+shared
+C&A&P<Q0,StackHead<S0, Stak>> |
+C&B&Stak&StackHead<S0, RestStak>&P<Q0, RestStak>
+        t<out Stat, out Stak, out RestStak, C>(P<Stat, Stak> state, C x, RestStak rest)
+        given Stat satisfies Q
+        given RestStak satisfies Stack
+        given Stak of StackEnd|StackHead<S0, RestStak>
+                   satisfies Stack
+        given C of A|B
+{ return nothing; }
+```
+As you can see, it now has an additional parameter `rest`, which allows the compiler to infer the type of `RestStak`.
+However, we also need something that we can pass to rest.
+This requires the following additions to `P` and `Stack`:
+```ceylon
+"Pair of two types"
+shared interface P<out T, out S> { shared formal T first; shared formal S second; }
+
+shared interface Stack
+        of StackHead|StackEnd
+        { shared formal Stack rest; }
+shared interface StackHead<out Element=S0, out Rest=Stack>
+        satisfies Stack
+        given Element satisfies S
+        given Rest satisfies Stack
+        { shared actual formal Rest rest; }
+shared interface StackEnd
+        satisfies Stack
+        { shared actual formal Nothing rest; }
+"Initial state"
+shared object initial satisfies P<Q0, StackEnd> { shared actual Q0 first = nothing; shared actual StackEnd second = nothing; }
+```
+which allows us to write:
+```ceylon
+// The following statements are well-typed because (()()) is a well-formed parenthetical expression.
+
+value s0 = initial;
+value s1 = t(s0, a, s0.second.rest);
+value s2 = t(s1, a, s1.second.rest);
+value s3 = t(s2, b, s2.second.rest);
+value s4 = t(s3, a, s3.second.rest);
+value s5 = t(s4, b, s2.second.rest);
+value s6 = t(s5, b, s5.second.rest);
+Accept end = s6;
+```
+We haven’t specified any types, but now the compiler is able to infer them and do all the work for us. Victory!
+(You can see the complete automaton in [source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon) and [.../demo.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/demo.ceylon).)
+
 So what?
 --------
 
