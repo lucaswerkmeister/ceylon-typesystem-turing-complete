@@ -343,6 +343,53 @@ Accept end = s6;
 We haven’t specified any types, but now the compiler is able to infer them and do all the work for us. Victory!
 (You can see the complete automaton in [source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon) and [.../demo.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/demo.ceylon).)
 
+Ceylon Type System is Turing complete
+-------------------------------------
+
+Now comes the best part: the Ceylon type system is Turing complete, which means that you can perform any calculation in the type system (with one restriction, which will become clear later).
+*Turing complete* means that the Ceylon type system can emulate a Turing machine, so let’s look at these first.
+
+A Turing machine is an abstract concept of a very simple, but still very powerful machine.
+Like a DFA or a pushdown automaton, it can be in one of several states which govern its behavior;
+however, unlike these, it does not read the input character by character, but rather operates on an indefinitely large “tape” that initially contains the input word, but to which the Turing machine can write whatever it wants and on which it can move freely.
+In each “step”, the Turing machine reads the character at the current position on the tape and then
+* writes the same or a different character back to the tape
+* moves 1 left, 1 right or stays in the same position
+* transitions into the same or a different state.
+The machine moves back and forth on the tape until it’s in an infinite loop: a state where it does not move and writes the same character that it just read.
+Then it halts.
+If you wanted to check some condition – if the input word is in the language that this Turing machine recognizes – then you usually check if the machine halted in an accepting state or not;
+if you wanted to perform some calculation, the result is left on the tape.
+
+Here’s an example of a Turing machine:
+
+TODO image of “powerOfTwo” Turing machine
+
+This Turing machine accepts an input word if its length is a power of two, or in other words, it recognizes the powers of two in unary encoding.
+This means that it accepts the inputs `x`, `xx`, `xxxx`, `xxxxxxxx` (length 1, 2, 4, 8), but will not accept `xxx`, `xxxxxx` (length 3, 6).
+Very roughly, it works by repeatedly going over the input word, each time replacing every second `x` with a `y`, until there’s only one `x` left.
+When it has seen an odd number of `x`s upon reaching the end of the word, it immediately rejects it.
+
+A more detailed explanation follows (if I omit the written character or movement, that means that the same character is written back and the Turing machine doesn’t move):
+* **`Q0`**: “trash” state. It loops forever (= the Turing machine halts) without accepting.
+* **`Q1`**: starting state, and the one we always return to when we start the next round of going over the input word.
+  The usual transition is to read an `x`, move right, and go to state `Q2`.
+* **`Q2`**: state after reading exactly one `x`.
+  Skips over consecutive `y`s until it reaches the next `x` (replace with `y`, go to `Q3`) or the end of the word (there was one `x` left in the word, accept it – go to `Q6`).
+* **`Q3`**: state after reading an even number of `x`s.
+  Skips over consecutive `y`s until it reaches the next `x` (go to `Q4`) or the end of the word (there was an even number of `x`s left in the word, enter next round – go to `Q5`).
+* **`Q4`**: state after reading an odd number of `x`s.
+  Skips over consecutive `y`s until it reaches the next `x` (replace with `y`, go to `Q3`) or the end of the word (there was an odd number of `x`s left in the word, abort – go to `Q0`).
+* **`Q5`**: rewind state.
+  Moves left until it reaches the beginning of the word, then goes back to `Q1`.
+
+Going over the word `xxxxxxxx`, it is transformed into `xyxyxyxy`, then `xyyyxyyy`, and then `xyyyyyyy`, and then the Turing machine accepts it.
+On the other hand, the word `xxxxxx` is transformed into `xyxyxy` and then the Turing machine sees an odd number of `x`s and rejects the word.
+
+(With a few more states, you could record how often the Turing machine cycled over the word, and thus turn it into one that calculates the logarithm base two of a given number.)
+
+TODO type system, go through description again (I don’t think I explained it very well)
+
 So what?
 --------
 
@@ -351,7 +398,4 @@ Well, I’m not sure.
 In principle, it’s certainly cool that you have such a powerful typesystem (see below for even more coolness).
 The technique used here might also be useful to framework authors to do multiple things with a single function.
 
-But wait, there’s more!
------------------------
-
-TODO. Cliffhanger :)
+TODO that “so what” was written for Chomsky-3 completeness. Obviously, a Turing complete type system is a lot cooler :)
