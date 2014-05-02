@@ -353,9 +353,11 @@ A Turing machine is an abstract concept of a very simple, but still very powerfu
 Like a DFA or a pushdown automaton, it can be in one of several states which govern its behavior;
 however, unlike these, it does not read the input character by character, but rather operates on an indefinitely large “tape” that initially contains the input word, but to which the Turing machine can write whatever it wants and on which it can move freely.
 In each “step”, the Turing machine reads the character at the current position on the tape and then
+
 * writes the same or a different character back to the tape
 * moves 1 left, 1 right or stays in the same position
 * transitions into the same or a different state.
+
 The machine moves back and forth on the tape until it’s in an infinite loop: a state where it does not move and writes the same character that it just read.
 Then it halts.
 If you wanted to check some condition – if the input word is in the language that this Turing machine recognizes – then you usually check if the machine halted in an accepting state or not;
