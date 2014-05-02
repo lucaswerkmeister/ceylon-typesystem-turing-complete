@@ -390,14 +390,123 @@ On the other hand, the word `xxxxxx` is transformed into `xyxyxy` and then the T
 
 (With a few more states, you could record how often the Turing machine cycled over the word, and thus turn it into one that calculates the logarithm base two of a given number.)
 
-TODO type system, go through description again (I don’t think I explained it very well)
+How do you turn this into a typing problem?
+It’s actually quite similar to the Chomsky-2 problem above (the matching parentheses), except that instead of one stack, you have two stacks and shift elements between them.
+For example, the tape `abc xyz` (the space represents where the head of the Turing machine is) is represented through the two stacks `abc` and `zyx`.
+If you imagine the two stacks vertically, put them next to each other, and then rotate the left one clockwise and the right one counter-clockwise, you should arrive at the horizontal tape.
 
-So what?
---------
+Therefore, the state transition function needs two additional type paramaters for the extra stack.
+On the other hand, we can lose the `C` (input character) because the input is now on the tape, which leaves us with the following type parameters and parameters:
 
-So what’s this good for, you ask?
-Well, I’m not sure.
-In principle, it’s certainly cool that you have such a powerful typesystem (see below for even more coolness).
-The technique used here might also be useful to framework authors to do multiple things with a single function.
+```ceylon
+t
+<out State, out LeftStack, out LeftRest, out RightStack, out RightRest>
+(B<State, LeftStack, RightStack> state, LeftStack leftStack, LeftRest leftRest, RightStack rightStack, RightRest rightRest)
+```
+So how does the return type look without `C`? Let’s have a look:
+```ceylon
+// Q0 is the “trash” state that loops forever
+State&Q0 & B<Q0, LeftStack, RightStack> |
+// Q1 is the initial state
+//         test: stack starts with SX                  move SX from right stack to left stack
+State&Q1 & RightStack&StackHead<SX, RightRest> & B<Q2, StackHead<SX, LeftStack>, RightRest> |
+//         test: stack starts with SY              that’s not allowed, trash
+State&Q1 & RightStack&StackHead<SY, RightRest> & B<Q0, LeftStack, RightStack> |
+//         oh, we’re done?         alright, let’s accept
+State&Q1 & RightStack&StackEnd & B<Q6, LeftStack, RightStack> |
+// ...
+```
+Alas! I have again deceived you, and shown you an example that doesn’t work.
+But why doesn’t it work?
 
-TODO that “so what” was written for Chomsky-3 completeness. Obviously, a Turing complete type system is a lot cooler :)
+Look again at how we test that the first item of the right stack is `SX`.
+We create the intersection `RightStack&StackHead<SX, RightRest>`, just like we previously created the intersection `C&SX`.
+It still clashes when the right stack doesn’t start with `SX`… but unfortunately, it doesn’t clash enough: the intersection is `StackHead<Nothing, RightRest>`, not `Nothing`.
+This means that we end up with both `B`s in the return type no matter what the input is.
+
+To solve that problem, we have to add more type parameters and parameters to `t`:
+```ceylon
+t
+<out State, out LeftStack, out LeftRest, out RightStack, out RightRest, Left, Right>
+(B<State, LeftStack, RightStack> state, Left left, LeftRest leftRest, Right right, RightRest rightRest)
+given State satisfies Q
+given Left satisfies S
+given Right satisfies S
+given LeftRest satisfies Stack
+given RightRest satisfies Stack
+given LeftStack of StackEnd|StackHead<Left, LeftRest>
+             satisfies Stack
+given RightStack of StackEnd|StackHead<Right, RightRest>
+             satisfies Stack
+```
+Now we can properly define the return type:
+```ceylon
+// this is the same, still trash
+State&Q0 & B<Q0, LeftStack, RightStack> |
+
+//         Right is SX      move SX from right to left stack = move to the right on tape
+State&Q1 & Right&SX & B<Q2, StackHead<SX, LeftStack>, RightRest> |
+//         Right is SY: trash
+State&Q1 & Right&SY & B<Q0, LeftStack, RightStack> |
+//         Right is finished       done
+State&Q1 & RightStack&StackEnd & B<Q6, LeftStack, RightStack> |
+// ...
+```
+Now, the `Nothing` trick works again: exactly one of the `Q1` “branches” will be non-`Nothing`, and we’ll only see the `B` of that branch.
+
+I haven’t shown you yet how this is used; for that, we need three more helper functions:
+```ceylon
+"Helper function to **b**uild an initial stack. See [[t]] for usage."
+StackHead<First, Rest>
+        b
+        <out First, out Rest>
+        (First first, Rest rest)
+        given First satisfies S
+        given Rest of StackEnd|StackHead<S, Stack>
+                   satisfies Stack
+{ return nothing; }
+
+StackEnd
+        e
+        ()
+{ return nothing; }
+
+B<Q1, StackEnd, Input>
+        initial
+        <out Input>
+        (Input input)
+        given Input satisfies Stack
+{ return nothing; }
+```
+These three functions together allow us to construct the initial stack for an input word:
+```ceylon
+value s00 = initial(b(x, b(x, b(x, b(x, b(x, b(x, b(x, b(x, e())))))))));
+```
+That’s eight `x`s pushed onto an empty stack and then turned into a tape + initial state by the `initial` function.
+After we have that, we stick it into `t` repeatedly:
+```ceylon
+value s01 = t(s00, s00.second.first, s00.second.rest, s00.third.first, s00.third.rest);
+value s02 = t(s01, s01.second.first, s01.second.rest, s01.third.first, s01.third.rest);
+// ...
+```
+The Turing machine now runs over the tape, turning the `xxxxxxxx` into first `xyxyxyxy`, then `xyyyxyyy` and finally `xyyyyyyy`, and then accepting it, all that in one iteration per function call.
+This takes a while (so to speak; it’s not really time it takes), and therefore we have to write out 60 iterations until we can write:
+```ceylon
+// ...
+value s60 = t(s59, s59.second.first, s59.second.rest, s59.third.first, s59.third.rest);
+Accept end = s60;
+```
+(where `alias Accept => B<Q6, Stack, Stack>;`).
+And if all that compiles, then we know that 8 is indeed a power of 2. Phew!
+
+The full example is in [source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon](source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon) and [.../demo.ceylon](source/ceylon/typesystem/demo/powerOfTwo/demo.ceylon).
+
+Closing words
+-------------
+If you’ve read this far, congratulations!
+I hope you now understand how the Ceylon type system is Turing complete;
+if you don’t, please open an issue or send me an E-mail.
+
+If you know any other reasonably short, but still at least sort of useful Turing machine that I could use as an example, please tell me!
+The “power of two” Turing machine is not an ideal “test case” for Turing completeness – for example, it never conditionally moves left.
+I’m pretty sure that you can indeed transform any Turing machine into a typing problem with the techniques outlined above, but I would like to try some more examples nonetheless to be absolutely certain.
