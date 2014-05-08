@@ -191,7 +191,13 @@ With each transition, you can push or pop a character from that stack, and you c
 
 For example, this is a very simple pushdown automaton:
 
-TODO image
+![A pushdown automaton](https://raw.githubusercontent.com/lucaswerkmeister/ceylon-typesystem-chomsky-3/renderedSVGs/wellFormedParentheses.png)
+
+<sup>(That is a rendered version of [this file](/wellFormedParentheses.svg), because SVGs aren’t supported in GitHub READMEs.)</sup>
+
+* `(,ε → x` means: if you read a `(` from input and nothing from the stack, push `x` onto the stack.
+* `(,x → xx` means: if you read a `(` from input and an `x` from the stack, push `xx` onto the stack (one `x` to replace the one we popped, and one `x` that we “actually push”).
+* `),x → ε` means: if you read a `)` from input and an `x` from the stack, push nothing onto the stack. (Since one `x` was popped for reading, this has the effect of popping one item.)
 
 It recognizes the language of all well-formed parentheses: Each `(` pushes an item onto the stack and each `)` pops it off again.
 The automaton accepts the input word by empty stack: if there were as many `(`s as `)`s, and there was never a `)` without a corresponding `(` before it, then the parentheses are well-formed.

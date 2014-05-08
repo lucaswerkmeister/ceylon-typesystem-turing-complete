@@ -1,0 +1,38 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="75" height="150">
+  <defs>
+    <style><![CDATA[
+      text {
+          text-anchor: middle;
+      }
+      text.transition {
+          font-size: 9pt;
+      }
+      g.node circle {
+          fill: white;
+          stroke: black;
+      }
+      g.node text.label tspan {
+          baseline-shift: sub;
+      }
+      path {
+          fill: transparent;
+          stroke: black;
+          marker-end: url("#Triangle");
+      }
+    ]]></style>
+    <marker id="Triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <polygon points="0,0 10,5 0,10"/>
+    </marker>
+  </defs>
+  <path d="M 10 120 H 30"/>
+  <g class="node" transform="translate(50 120)">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>0</tspan></text>
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-95">(,ε → x</text>
+    <text class="transition" y="-80">(,x → xx</text>
+    <text class="transition" y="-65">),x → ε</text>
+    <use xlink:href="#arrowClockwise" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+    <use xlink:href="#arrowCounterclockwise" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+  </g>
+</svg>
