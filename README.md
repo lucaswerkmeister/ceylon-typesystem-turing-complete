@@ -371,7 +371,11 @@ if you wanted to perform some calculation, the result is left on the tape.
 
 Here’s an example of a Turing machine:
 
-TODO image of “powerOfTwo” Turing machine
+![A Turing machine testing if the length of the input is a power of two](https://raw.githubusercontent.com/lucaswerkmeister/ceylon-typesystem-chomsky-3/renderedSVGs/powerOfTwo.png)
+
+<sup>(That is a rendered version of [this file](/powerOfTwo.svg), because SVGs aren’t supported in GitHub READMEs.)</sup>
+
+* `x→y|R` means: if you read an `x` from the tape, write a `y` to the tape and move <strong>r</strong>ight. (Other movements are <strong>l</strong>eft and <strong>n</strong>o movement.)
 
 This Turing machine accepts an input word if its length is a power of two, or in other words, it recognizes the powers of two in unary encoding.
 This means that it accepts the inputs `x`, `xx`, `xxxx`, `xxxxxxxx` (length 1, 2, 4, 8), but will not accept `xxx`, `xxxxxx` (length 3, 6).

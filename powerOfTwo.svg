@@ -1,0 +1,128 @@
+<svg width="1000" height="1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <style><![CDATA[
+      text {
+          text-anchor: middle;
+      }
+      text.transition {
+          font-size: 9pt;
+      }
+      g.node circle {
+          fill: white;
+          stroke: black;
+      }
+      g.node text.label tspan {
+          baseline-shift: sub;
+      }
+      line.transition {
+          stroke: black;
+          marker-end: url("#Triangle");
+      }
+      path {
+          fill: transparent;
+          stroke: black;
+          marker-end: url("#Triangle");
+      }
+    ]]></style>
+    <marker id="Triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <polygon points="0,0 10,5 0,10"/>
+    </marker>
+  </defs>
+  
+  <path id="start" d="M 100 250 H 130"/>
+  
+  <g id="q6" transform="translate(250 125)" class="node">
+    <circle r="20"/>
+    <circle r="18"/>
+    <text class="label" y="5">q<tspan>6</tspan></text>
+    
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-120">
+      <tspan x="0" dy="1.4em">x→x|N</tspan>
+      <tspan x="0" dy="1.4em">y→y|N</tspan>
+      <tspan x="0" dy="1.4em">␣→␣|N</tspan>
+    </text>
+  </g>
+  
+  <g id="q1" transform="translate(150 250)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>1</tspan></text>
+    
+    <line class="transition" x1="20" y1="0" x2="180" y2="0"/>
+    <text class="transition" x="100" y="-10">x→x|R</text>
+    
+    <line class="transition" x1="-12.5" y1="15.6" x2="-87.5" y2="109.4"/>
+    <text class="transition" x="-40" y="85.5">y→y|N</text>
+    
+    <line class="transition" x1="12.5" y1="-15.6" x2="87.5" y2="-109.4"/>
+    <text class="transition" x="40" y="-85.5">␣→␣|N</text>
+  </g>
+  
+  <g id="q0" transform="translate(50 375)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>0</tspan></text>
+    
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-120">
+      <tspan x="0" dy="1.4em">x→x|N</tspan>
+      <tspan x="0" dy="1.4em">y→y|N</tspan>
+      <tspan x="0" dy="1.4em">␣→␣|N</tspan>
+    </text>
+  </g>
+  
+  <g id="q2" transform="translate(350 250)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>2</tspan></text>
+
+    <line class="transition" x1="0" y1="20" x2="0" y2="230"/>
+    <text class="transition" x="25" y="125">x→y|R</text>
+    
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-70">y→y|R</text>
+    
+    <line class="transition" x1="-12.5" y1="-15.6" x2="-87.5" y2="-109.4"/>
+    <text class="transition" x="-40" y="-85.5">␣→␣|N</text>
+  </g>
+  
+  <g id="q3" transform="translate(350 500)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>3</tspan></text>
+    
+    <path d="M -15 -12 C -66 -37.5, -133 -37.5, -185 -12"/>
+    <text class="transition" x="-100" y="-37.5">x→x|R</text>
+    
+    <path d="M 0 20 C -50 75, 50 75, 0 20"/>
+    <text class="transition" y="75">y→y|R</text>
+    
+    <line class="transition" x1="-12.5" y1="-15.6" x2="-87.5" y2="-109.4"/>
+    <text class="transition" x="-40" y="-85.5">␣→␣|L</text>
+  </g>
+  
+  <g id="q4" transform="translate(150 500)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>4</tspan></text>
+    
+    <path d="M 15 12 C 66 37.5, 133 37.5, 185 12"/>
+    <text class="transition" x="100" y="45">x→y|R</text>
+    
+    <path d="M 0 20 C -50 75, 50 75, 0 20"/>
+    <text class="transition" y="75">y→y|R</text>
+    
+    <line class="transition" x1="-12.5" y1="-15.6" x2="-87.5" y2="-109.4"/>
+    <text class="transition" x="-40" y="-85.5">␣→␣|N</text>
+  </g>
+  
+  <g id="q5" transform="translate(250 375)" class="node">
+    <circle r="20"/>
+    <text class="label" y="5">q<tspan>5</tspan></text>
+    
+    <path d="M 0 -20 C -50 -75, 50 -75, 0 -20"/>
+    <text class="transition" y="-110">
+      <tspan x="0" dy="1.4em">x→x|L</tspan>
+      <tspan x="0" dy="1.4em">y→y|L</tspan>
+    </text>
+    
+    <line class="transition" x1="-12.5" y1="-15.6" x2="-87.5" y2="-109.4"/>
+    <text class="transition" x="-65" y="-39.5">␣→␣|R</text>
+  </g>
+</svg>
