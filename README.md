@@ -179,7 +179,7 @@ Note that the first argument is now of type `B<S>` instead of `S`.
 Even if it’s a `Q0&R0&B<S>`, we don’t care, since we only cherry-pick the `S` part.
 
 And that’s it! Now it works, and we’ve encoded the automaton into the type system.
-(You can see the entire file in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon](source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon).)
+(You can see the entire file in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon](../eca01e028b71a8272480d16663f7e603be7a2fd8/source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon).)
 
 Ceylon Type System is Chomsky-2 complete
 ----------------------------------------
@@ -347,7 +347,7 @@ value s6 = t(s5, b, s5.second.rest);
 Accept end = s6;
 ```
 We haven’t specified any types, but now the compiler is able to infer them and do all the work for us. Victory!
-(You can see the complete automaton in [source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon) and [.../demo.ceylon](source/ceylon/typesystem/demo/wellFormedParentheses/demo.ceylon).)
+(You can see the complete automaton in [source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon](../b00b7d8babb01a14b0a571037aaf667813ce6ea1/source/ceylon/typesystem/demo/wellFormedParentheses/automaton.ceylon) and [.../demo.ceylon](../28555ee04e0a33b9516002166c1234ae49979d4f/source/ceylon/typesystem/demo/wellFormedParentheses/demo.ceylon).)
 
 Ceylon Type System is Turing complete
 -------------------------------------
@@ -509,7 +509,7 @@ Accept end = s60;
 (where `alias Accept => B<Q6, Stack, Stack>;`).
 And if all that compiles, then we know that 8 is indeed a power of 2. Phew!
 
-The full example is in [source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon](source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon) and [.../demo.ceylon](source/ceylon/typesystem/demo/powerOfTwo/demo.ceylon).
+The full example is in [source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon](../50256cd8d7599ec27c9d885c248988a8726086ac/source/ceylon/typesystem/demo/powerOfTwo/automaton.ceylon) and [.../demo.ceylon](../50256cd8d7599ec27c9d885c248988a8726086ac/source/ceylon/typesystem/demo/powerOfTwo/demo.ceylon).
 
 Closing words
 -------------
