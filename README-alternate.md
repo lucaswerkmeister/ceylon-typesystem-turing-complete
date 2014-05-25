@@ -14,7 +14,67 @@ because what we’ll be doing in the second part of this “article” <!-- TODO
 Turing machines
 ---------------
 
-TODO
+<sup>Note: you can mostly skip this section if you already know what a Turing machine is; you’ll only need the last Turing machine for the second part.</sup>
+
+The Turing machine is a computational model – you say that a system is Turing complete if it can emulate an arbitrary Turing machine.
+A Turing machine itself is a simple data processing machine:
+it operates step by step on a tape, on which it can move left and right, and its behavior is governed by what it reads from the tape and its internal state.
+
+More precisely, a Turing machine is a collection of states, where each state maps an input character to an output character, a movement instruction (<strong>l</strong>eft, <strong>r</strong>ight, <strong>n</strong>o movement), and a “next” state.
+To run a Turing machine, you write the input word on the tape, and then in each step you
+1. read a character from the Turing machine’s current position (it starts at the first input character)
+2. read the output character for this character from the Turing machine’s current state, and write it
+3. read the movement for this character from the Turing machine’s current state, and execute it – move by one step in the appropriate direction (or don’t move)
+4. read the next state for this character from the Turing machine’s current state, and set the current state to that
+5. repeat.
+
+When the Turing machine reaches a state where it doesn’t move, doesn’t change state, and writes the same character it read, then it halts.
+Sometimes, the states are classified as “accepting” and “rejecting”, in which case the Turing machine “accepts” or “rejects” the input word based on the final state;
+otherwise, the Turing machine performed some computation, and the result of that computation is left on the tape.
+
+This model is relatively simple, but you can perform any calculation with it – multiplication, testing if a number is prime, anything.
+I/O devices and speed left aside, your computer is no more powerful than a Turing machine, and a Turing machine could fully emulate it.
+
+Emulating a modern PC in a Turing machine is pretty complicated, though. We’ll start simple, with a Turing machine that tests if the input has even length.
+
+    Input: A sequence of ‘1’s of various length
+    States:
+    
+    State | Read | Write | Move | Next state
+    ========================================
+    S1    | 1    | 1     | R    | S2
+            ␣    | ␣     | N    | S1
+    ----------------------------------------
+    S2    | 1    | 1     | R    | S1
+            ␣    | ␣     | N    | S2
+    
+    Initial state: S1
+    Accepting states: S1
+
+The Turing machine scans the input left-to-right, alternating between `S1` and `S2`.
+When it reaches the end of the input – ‘␣’ means the “blank” character that’s on the empty tape – it stops.
+If the input length was even, it alternated an even amount of times between S1 and S2, ending up in S1 and accepting the input (because S1 is an accepting state).
+If the input length was odd, it ended up in S2 and rejected the input (because S2 is not an accepting state).
+
+This Turing machine tested if the input length was a multiple of two; next up, we’ll test if it’s a *power* of two.
+That Turing machine is a bit more complicated, and so we’ll represent it as a graph instead of a table:
+
+![A Turing machine testing if the length of the input is a power of two](https://raw.githubusercontent.com/lucaswerkmeister/ceylon-typesystem-chomsky-3/renderedSVGs/powerOfTwo.png)
+
+<sup>(That is a rendered version of [this file](/powerOfTwo.svg), because SVGs aren’t supported in GitHub READMEs.)</sup>
+
+Circles denote states; the state with the small unlabeled arrow pointing into it is the initial state.
+An arrow from `Q1` to `Q2` labeled `x→y|R` means: when you’re in state `Q1` and read an `x`, write a `y`, move <strong>r</strong>ight and go to state `Q2`.
+A double circle marks an accepting state, the other states are rejecting.
+
+The basic idea is to go over the input repeatedly; each time, you replace every second `x` with a `y` (which is ignored in subsequent runs).
+When that always worked out, and in the end you end up with a single `x` remaining, then the input length was a power of two
+(in each run, you divided it by two, and you never got an error).
+If in one run there isn’t an even amount of `x`s so that you could leave and convert an equal amount of them, then the input length was not a power of two, and you reject the word (by transitioning into the “trash” state `Q0`).
+
+Now, we will implement that Turing machine in the Ceylon type system.
+
+<sup>Note: if I’ve done a bad job at explaining what a Turing machine is, I’m sorry; the [Wikipedia article](https://en.wikipedia.org/wiki/Turing_machine) probably does a better job.</sup>
 
 Emulating a Turing machine in the Ceylon type system
 ----------------------------------------------------
