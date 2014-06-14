@@ -79,6 +79,144 @@ Now, we will implement that Turing machine in the Ceylon type system.
 Emulating a Turing machine in the Ceylon type system
 ----------------------------------------------------
 
+We will implement a Turing machine in the Ceylon type system by composing a function with type arguments whose return type simulates a single step of a Turing machine.
+Then, by chaining many invocations of this function together – each with the result of the previous invocation as its argument – we simulate a run of the Turing machine.
+
+The fundamental idea here is that a function can return more than one type through union types.
+Given disjoint interfaces `A1` and `A2`, the return type of
+```ceylon
+I&A1&X |
+I&A2&Y
+fun<I>(I i)
+        given I of A1|A2
+        => nothing;
+```
+is assignable to
+* `X` if `I` is `A1` (`I&A2` will be `Nothing`, removing the `Y` from the union)
+* `Y` if `I` is `A2` (`I&A1` will be `Nothing`, removing the `X` from the union).
+That’s a very basic `if` decision, and we’ll construct the Turing machine from that.
+
+The code I showed above has a problem, though:
+If you plug the return type from above into the function again, you still have the `I&A1` in addition to the `X` in it,
+and if you do this again and again, you intersect more and more types onto the return type.
+This is fatal if, for example, the `I&A1` branch was taken, but `X` is `A2` – the intersection of that is `Nothing`, so you’ve lost information.
+
+You somehow need to get rid of the parts of the return type that you don’t want:
+separate the decision (`I&A1`) from the result (`X`).
+We do that with some more generics:
+
+```ceylon
+interface B<out T> {}
+```
+
+This is a “box” around a type.
+If we now write the signature
+```ceylon
+I&A1&B<X> |
+I&A2&B<Y>
+fun<I>(B<I> i)
+        given I of A1|A2
+        => nothing;
+```
+the returned type is assignable to `B<X>` instead of `X`;
+when we put that into `fun` again, we just take the inner `I` (=`X`), stripping away not only `B` but also the `I&A1` part that we don’t want.
+
+(We now have enough to implement a DFA in the type system, as I’ve done in [source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon](../b47ad63a304d76986de2ef70f7e0d5426732fe25/source/ceylon/typesystem/demo/notDivisibleByThree/automaton.ceylon).)
+
+Now, we need to capture a lot of data to implement the Turing machine: not just its current state, but also its data tape and the position on the tape.
+
+The state is easy:
+```ceylon
+shared interface Q of Q0|Q1|Q2/*...*/ {}
+
+shared interface Q0 satisfies Q {}
+/*...*/
+
+
+We will emulate the tape through a pair of stacks;
+if you stick them together, you get the entire tape, and the juncture point (TODO is that correct english?) marks the current position:
+the stacks
+```
+A   X
+B   Y
+C   Z
+```
+represent the tape
+```
+CBA>XYZ
+```
+where the `>` represents the current position on the tape.
+
+To represent a stack in the type system, we simply use a linked list, similar to `Tuple`:
+```ceylon
+/* stack elements */
+shared interface S of SX|SY/*...*/ {}
+shared interface SX satisfies S {}
+/*...*/
+
+shared interface Stack
+        of StackHead<S, Stack>|StackEnd
+        { shared actual formal Stack rest; shared actual formal S first; }
+shared interface StackHead<out Element, out Rest>
+        satisfies Stack
+        given Element satisfies S
+        given Rest satisfies Stack
+        { shared actual formal Rest rest; shared actual formal Element first; }
+shared interface StackEnd
+        satisfies Stack
+        { shared actual formal Nothing rest; shared actual formal Nothing first; }
+```
+
+Now, the stack `SX SY SY` can be represented as the type
+```ceylon
+StackHead<SX, StackHead<SY, StackHead<SY, StackEnd>>>
+```
+
+Our type box now needs to contain three types instead of one (state, left stack, right stack), so we’ll expand it:
+```ceylon
+"Box around three types"
+shared interface B<out A, out B, out C> { shared formal A first; shared formal B second; shared formal C third; }
+```
+
+The type system Turing machine could now look like this:
+```ceylon
+t
+<out State, out LeftStack, out LeftRest, out RightStack, out RightRest, Left, Right>
+(B<State, LeftStack, RightStack> state)
+given State satisfies Q
+given Left satisfies S
+given Right satisfies S
+given LeftRest satisfies Stack
+given RightRest satisfies Stack
+given LeftStack of StackEnd|StackHead<Left, LeftRest>
+             satisfies Stack
+given RightStack of StackEnd|StackHead<Right, RightRest>
+             satisfies Stack
+```
+
+We need `Left` and `Right` to read the first symbol on the left/right stack;
+if we formed the intersection `LeftStack&StackHead<SX, LeftRest>` and `LeftStack` was in fact a `StackHead<SY, LeftRest>`, the result would be a `LeftStack<Nothing, LeftRest>` rather than the `Nothing` that we need to make the thing work.
+
+However, this can’t work: if `LeftStack` is a `StackEnd`, then what’s `Left` and `LeftRest`?
+They’re invalid, and while we don’t care because we won’t use them in that case, the Ceylon typechecker can’t accept this because we might use these type parameters in reified generics in the body
+Therefore, we need a way to specify them, by adding more parameters:
+```ceylon
+t
+<out State, out LeftStack, out LeftRest, out RightStack, out RightRest, Left, Right>
+(B<State, LeftStack, RightStack> state, Left left, LeftRest leftRest, Right right, RightRest rightRest)
+//                                      ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+given State satisfies Q
+given Left satisfies S
+given Right satisfies S
+given LeftRest satisfies Stack
+given RightRest satisfies Stack
+given LeftStack of StackEnd|StackHead<Left, LeftRest>
+             satisfies Stack
+given RightStack of StackEnd|StackHead<Right, RightRest>
+             satisfies Stack
+```
+
+And now it’s just missing the return type to complete the Turing machine:
 TODO
 
 Addendum: Just how Turing complete is it?
