@@ -131,7 +131,7 @@ shared interface Q of Q0|Q1|Q2/*...*/ {}
 
 shared interface Q0 satisfies Q {}
 /*...*/
-
+```
 
 We will emulate the tape through a pair of stacks;
 if you stick them together, you get the entire tape, and the juncture point (TODO is that correct english?) marks the current position:
