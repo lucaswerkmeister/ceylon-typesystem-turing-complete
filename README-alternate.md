@@ -14,7 +14,7 @@ because what we’ll be doing in the second part of this “article” <!-- TODO
 Turing machines
 ---------------
 
-<sup>Note: you can mostly skip this section if you already know what a Turing machine is; you’ll only need the last Turing machine for the second part.</sup>
+<sup>Note: you can skip this section if you already know what a Turing machine is.</sup>
 
 The Turing machine is a computational model – you say that a system is Turing complete if it can emulate an arbitrary Turing machine.
 A Turing machine itself is a simple data processing machine:
@@ -198,7 +198,7 @@ We need `Left` and `Right` to read the first symbol on the left/right stack;
 if we formed the intersection `LeftStack&StackHead<SX, LeftRest>` and `LeftStack` was in fact a `StackHead<SY, LeftRest>`, the result would be a `LeftStack<Nothing, LeftRest>` rather than the `Nothing` that we need to make the thing work.
 
 However, this can’t work: if `LeftStack` is a `StackEnd`, then what’s `Left` and `LeftRest`?
-They’re invalid, and while we don’t care because we won’t use them in that case, the Ceylon typechecker can’t accept this because we might use these type parameters in reified generics in the body
+They’re invalid, and while we don’t care because we won’t use them in that case, the Ceylon typechecker can’t accept this because we might use these type parameters in reified generics in the body.
 Therefore, we need a way to specify them, by adding more parameters:
 ```ceylon
 t
@@ -217,7 +217,60 @@ given RightStack of StackEnd|StackHead<Right, RightRest>
 ```
 
 And now it’s just missing the return type to complete the Turing machine:
-TODO
+For every possible state of the turing machine and every possible case of `Right` (all case types of `S`), as well as the case `RightStack=StackEnd`, add one “branch” to the return type, which is the intersection of
+- `State`
+- the state,
+- either
+  - `Right` and the case type of `S`, or
+  - `RightStack` and `StackEnd`, and
+- the box `B` around
+  - the new state,
+  - the new left stack, and
+  - the new right stack.
+
+The new stack is formed like this:
+
+write?\Move?|left|no|right
+----:|--------------------------------------------|-------------------------------------------|--------------------------------------------
+yes  |  `LeftRest`, `StackHead<New, RightStack>`  |  `LeftStack`, `StackHead<New, RightRest>` |  `StackHead<New, LeftStack>`, `RightRest`
+no   |  `LeftRest`, `StackHead<Left, RightStack>` |  `LeftStack`, `RightStack`                |  `StackHead<Right, LeftStack>`, `RightRest`
+
+(It gets a bit more tricky when `RightStack` is `StackEnd`, because you can’t move onto the “blank” cell (that’s not really there)
+unless you’re writing something to it.
+Depending on your Turing machine, this might not be a problem because you might never want to move onto blank cells;
+otherwise, you’ll probably need to introduce a “blank” pseudo-character that you can write onto the tape.)
+
+Then you form the union of all these branch types, and use that union type as return type of `t`.
+
+For example, here is the transition for a very simple Turing machine that reads the input left-to-right,
+alternating between `Q1` and `Q2`, thus tracking if the input has even or odd length:
+
+```ceylon
+State&Q1 & Right&S & B<Q2, StackHead<Right, LeftStack>, RightRest> |
+State&Q2 & Right&S & B<Q1, StackHead<Right, LeftStack>, RightRest> |
+
+State&Q1 & RightStack&StackEnd & B<Q1, LeftStack, RightStack> |
+State&Q2 & RightStack&StackEnd & B<Q2, LeftStack, RightStack>
+
+        t
+        <out State, out LeftStack, out LeftRest, out RightStack, out RightRest, Left, Right>
+        (B<State, LeftStack, RightStack> state)
+        given State satisfies Q
+        given Left satisfies S
+        given Right satisfies S
+        given LeftRest satisfies Stack
+        given RightRest satisfies Stack
+        given LeftStack of StackEnd|StackHead<Left, LeftRest>
+                     satisfies Stack
+        given RightStack of StackEnd|StackHead<Right, RightRest>
+                     satisfies Stack
+        { return nothing; }
+```
+
+(Note: Normally, I would put all `Q1` branches together, then all `Q2` branches.
+I grouped them differently here because in this case, `Q1` and `Q2` are almost identical.)
+
+TODO Usage
 
 Addendum: Just how Turing complete is it?
 -----------------------------------------
