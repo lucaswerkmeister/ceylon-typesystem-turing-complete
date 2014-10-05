@@ -148,7 +148,7 @@ CBA>XYZ
 ```
 where the `>` represents the current position on the tape.
 
-To represent a stack in the type system, we simply use a linked list, similar to `Tuple`:
+To represent a stack in the type system, we use a linked list of types, similar to `Tuple`:
 ```ceylon
 /* stack elements */
 shared interface S of SX|SY/*...*/ {}
