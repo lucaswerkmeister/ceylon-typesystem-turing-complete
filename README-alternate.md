@@ -64,7 +64,7 @@ That Turing machine is a bit more complicated, and so we’ll represent it as a 
 <sup>(That is a rendered version of [this file](/powerOfTwo.svg), because SVGs aren’t supported in GitHub READMEs.)</sup>
 
 Circles denote states; the state with the small unlabeled arrow pointing into it is the initial state.
-An arrow from `Q1` to `Q2` labeled `x→y|R` means: when you’re in state `Q1` and read an `x`, write a `y`, move <strong>r</strong>ight and go to state `Q2`.
+An arrow from `q2` to `q3` labeled `x→y|R` means: when you’re in state `q2` and read an `x`, write a `y`, move <strong>r</strong>ight and go to state `q3`.
 A double circle marks an accepting state, the other states are rejecting.
 
 The basic idea is to go over the input repeatedly; each time, you replace every second `x` with a `y` (which is ignored in subsequent runs).
