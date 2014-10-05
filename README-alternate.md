@@ -94,6 +94,7 @@ fun<I>(I i)
 is assignable to
 * `X` if `I` is `A1` (`I&A2` will be `Nothing`, removing the `Y` from the union)
 * `Y` if `I` is `A2` (`I&A1` will be `Nothing`, removing the `X` from the union).
+
 That’s a very basic `if` decision, and we’ll construct the Turing machine from that.
 
 The code I showed above has a problem, though:
