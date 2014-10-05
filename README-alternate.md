@@ -151,7 +151,7 @@ To represent a stack in the type system, we simply use a linked list, similar to
 ```ceylon
 /* stack elements */
 shared interface S of SX|SY/*...*/ {}
-shared interface SX satisfies S {}
+shared interface SX of x satisfies S {} shared object x satisfies SX {}
 /*...*/
 
 shared interface Stack
@@ -270,7 +270,58 @@ State&Q2 & RightStack&StackEnd & B<Q2, LeftStack, RightStack>
 (Note: Normally, I would put all `Q1` branches together, then all `Q2` branches.
 I grouped them differently here because in this case, `Q1` and `Q2` are almost identical.)
 
-TODO Usage
+Now that we have that function, we just need to set up some “plumbing” – the feedback loop, so to speak.
+First, we’ll need three functions to construct the initial state:
+
+```ceylon
+"Helper function to **b**uild an initial stack. See [[t]] for usage."
+StackHead<First, Rest>
+        b
+        <out First, out Rest>
+        (First first, Rest rest)
+        given First satisfies S
+        given Rest of StackEnd|StackHead<S, Stack>
+                   satisfies Stack
+{ return nothing; }
+
+StackEnd
+        e
+        ()
+{ return nothing; }
+
+B<Q1, StackEnd, Input>
+        initial
+        <out Input>
+        (Input input)
+        given Input satisfies Stack
+{ return nothing; }
+```
+We build up a stack by chaining several `b` calls (terminating with an `e()`), and then turn it into a complete state with the `initial` function:
+```ceylon
+value s00 = initial(b(x, b(x, b(x, e()))));
+```
+And then we repeatedly plug that into `t`, recording each result in a new value:
+```ceylon
+value s01 = t(s00, s00.second.first, s00.second.rest, s00.third.first, s00.third.rest);
+value s02 = t(s01, s01.second.first, s01.second.rest, s01.third.first, s01.third.rest);
+// ...
+```
+Each new value now represents one more iteration of the Turing machine.
+Value s<em>n</em> contains the result of the Turing machine after *n* iterations.
+
+If the Turing machine tests a certain condition (“is this number a power of two?“), then it will probably have one or more *accepting states*, and then you can summarize them like this:
+```ceylon
+"Accepting state(s)"
+shared alias Accept => B<Q1, Stack, Stack>;
+```
+In this case, `Q1` is the accepting state. You can then use it like this at the end of the “iteration”:
+```ceylon
+Accept end = sX;
+```
+If this is well-typed, then your Turing machine accepted the input word after *X* iterations.
+
+On the other hand, if your Turing machine calculates some result that you want to get, you can just let the IDE insert the inferred value for `sX` to get the result after *X* iterations.
+
 
 Addendum: Just how Turing complete is it?
 -----------------------------------------
