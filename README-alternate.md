@@ -70,7 +70,7 @@ A double circle marks an accepting state, the other states are rejecting.
 The basic idea is to go over the input repeatedly; each time, you replace every second `x` with a `y` (which is ignored in subsequent runs).
 When that always worked out, and in the end you end up with a single `x` remaining, then the input length was a power of two
 (in each run, you divided it by two, and you never got an error).
-If in one run there isn’t an even amount of `x`s so that you could leave and convert an equal amount of them, then the input length was not a power of two, and you reject the word (by transitioning into the “trash” state `Q0`).
+If in one run there isn’t an even amount of `x`s so that you could leave and convert an equal amount of them, then the input length was not a power of two, and you reject the word (by transitioning into the “trash” state `q0`).
 
 Now, we will implement that Turing machine in the Ceylon type system.
 
