@@ -323,6 +323,10 @@ If this is well-typed, then your Turing machine accepted the input word after *X
 
 On the other hand, if your Turing machine calculates some result that you want to get, you can just let the IDE insert the inferred value for `sX` to get the result after *X* iterations.
 
+And that’s it! We now have emulated a Turing machine in the Ceylon type system. Great!
+
+A full example of a Turing machine that tests if the length of the input word is a power of two can be found [here](https://github.com/lucaswerkmeister/ceylon-typesystem-turing-complete/tree/386f9913d22f51d533e52e0a343307703aac83fd/source/ceylon/typesystem/demo/powerOfTwo).
+
 
 Addendum: Just how Turing complete is it?
 -----------------------------------------
